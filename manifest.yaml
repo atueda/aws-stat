@@ -1,0 +1,47 @@
+display_information:
+  name: AWS Stat
+  description: Launches the rocket!
+  background_color: "#1b1c1f"
+features:
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: stat
+    always_online: true
+oauth_config:
+  redirect_urls:
+    - https://a7amyfall0.execute-api.us-east-1.amazonaws.com/SlackBotStage/oauth_redirect
+  scopes:
+    user:
+      - admin.analytics:read
+      - discovery:read
+      - discovery:write
+      - search:read
+    bot:
+      - app_mentions:read
+      - channels:history
+      - channels:read
+      - chat:write
+      - files:read
+      - files:write
+      - reactions:read
+      - team:read
+      - users:read
+      - groups:read
+      - im:history
+settings:
+  event_subscriptions:
+    request_url: https://0go34qylkk.execute-api.us-east-1.amazonaws.com/dev/slack/events
+    bot_events:
+      - app_home_opened
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: true
+    request_url: https://0go34qylkk.execute-api.us-east-1.amazonaws.com/dev/slack/events
+  org_deploy_enabled: true
+  socket_mode_enabled: false
+  token_rotation_enabled: false
+

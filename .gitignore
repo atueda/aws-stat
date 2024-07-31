@@ -1,0 +1,8 @@
+# node / npm
+node_modules/
+package-lock.json
+node_modules/*
+.serverless/*
+.env
+.DS_Store
+.env copy

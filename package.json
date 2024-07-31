@@ -1,0 +1,19 @@
+{
+  "name": "aws-stat",
+  "version": "1.0.0",
+  "description": "Stat for AWS",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^3.19.0",
+    "dayjs": "^1.11.11",
+    "axios": "^1.7.2"
+  },
+  "devDependencies": {
+    "serverless-offline": "^13.6.0"
+  }
+}
