@@ -1,67 +1,102 @@
-# Getting Started ⚡️ Bolt for JavaScript
-> Slack app example from 📚 [Getting started with Bolt for JavaScript tutorial][1]
+# Slackデータ分析ツール
 
-## Overview
+## 概要
 
-This is a Slack app built with the [Bolt for JavaScript framework][2] that showcases
-responding to events and interactive buttons.
+このツールはSlack APIを使用して、Slackワークスペースのデータを収集し、以下の情報を集計します：
 
-## Running locally
+- ユーザー数（管理者、所有者、ボットを含む）
+- bMAU（ビジネス上の月間アクティブユーザー数）
+- メッセージ数総数
+- チャンネル数（Public/Privateチャンネルの数を含む）
 
-### 0. Create a new Slack App
+## セットアップ方法
 
-- Go to https://api.slack.com/apps
-- Click **Create App**
-- Choose a workspace
-- Enter App Manifest using contents of `manifest.yaml`
-- Click **Create**
+### 前提条件
 
-Once the app is created click **Install to Workspace** 
-Then scroll down in Basic Info and click **Generate Token and Scopes** with both scopes
+- Node.jsとnpmがインストールされていること
+- Serverless Frameworkがインストールされていること
+- AWSアカウントがあること
+- Slack APIのトークンがあること
 
-### 1. Setup environment variables
+### 1. リポジトリのクローン
 
-```zsh
-# Replace with your bot and app token
-export SLACK_BOT_TOKEN=<your-bot-token> # from the OAuth section
-export SLACK_APP_TOKEN=<your-app-level-token> # from the Basic Info App Token Section
+以下のコマンドを使用してリポジトリをクローンします：
+
+```bash
+git clone https://github.com/your-repository/slack-data-analysis.git
+cd slack-data-analysis
 ```
 
-### 2. Setup your local project
-
-```zsh
-# Clone this project onto your machine
-git clone https://github.com/slackapi/bolt-js-getting-started-app.git
-
-# Change into the project
-cd bolt-js-getting-started-app/
-
-# Install the dependencies
+### 2. 必要なパッケージのインストール
+```bash
 npm install
 ```
 
-### 3. Start servers
-```zsh
-npm run start
+### 3. Serverless Frameworkの設定
+serverless.ymlファイルを作成し、以下の設定を追加します：
+
+```bash
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: YOUR-NAME
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: aws-stat
+service: aws-stat
+provider:
+  name: aws
+  runtime: nodejs20.x
+  environment:
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+functions:
+  slack:
+    handler: app.handler
+    events:
+      - http:
+          path: slack/events
+          method: post
+plugins:
+  - serverless-offline
+```
+### 4. 環境変数の設定
+
+AWS Lambdaで使用する環境変数を設定します。以下の変数が必要です：
+
+- `SLACK_SIGNING_SECRET` - Slackアプリの署名シークレット
+- `SLACK_BOT_TOKEN` - Slackボットのアクセストークン
+
+これらの環境変数は、AWS Lambdaの設定で入力するか、`.env`ファイルに記述して使用します。
+
+### 5. Lambda関数のデプロイ
+
+Serverless Frameworkを使用してAWS Lambdaにデプロイします：
+
+```bash
+serverless deploy
 ```
 
-### 4. Test
+### 6. テストとデバッグ
 
-Go to the installed workspace and type **Hello** in a DM to your new bot. You can also type **Hello** in a channel where the bot is present
+#### ローカルテスト
 
-## Contributing
+デプロイ後、以下のコマンドを使用してローカル環境でのテストを行うことができます：
 
-### Issues and questions
+```bash
+serverless invoke local --function slackDataAnalysis
 
-Found a bug or have a question about this project? We'd love to hear from you!
+## トラブルシューティング
 
-1. Browse to [slackapi/bolt-js/issues][4]
-1. Create a new issue
-1. Select the `[x] examples` category
+- **環境変数の設定ミス**: 環境変数が正しく設定されていることを確認してください。特にトークンやシークレットが正しいかどうかをチェックします。
 
-See you there and thanks for helping to improve Bolt for everyone!
+- **API Gatewayのエラー**: API Gatewayの設定やURLが正しいか確認してください。また、Lambda関数のログでエラーの詳細を確認することができます。
 
-[1]: https://slack.dev/bolt-js/tutorial/getting-started
-[2]: https://slack.dev/bolt-js/
-[3]: https://slack.dev/bolt-js/tutorial/getting-started#setting-up-events
-[4]: https://github.com/slackapi/bolt-js/issues/new
+- **データ取得の失敗**: Slack APIのレスポンスやエラーメッセージを確認し、必要に応じてリクエストパラメータを修正します。
+
+- **Lambda関数のエラー**: Lambda関数のログでエラーのスタックトレースやメッセージを確認し、コードの修正が必要かどうかを判断します。
+
+## 追加情報
+
+詳しいAPIの使い方やServerless Frameworkの設定については、以下の公式ドキュメントを参照してください：
+
+- [Slack API Documentation](https://api.slack.com/)
+- [Serverless Framework Documentation](https://www.serverless.com/framework/docs/)
+- [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
